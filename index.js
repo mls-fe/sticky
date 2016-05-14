@@ -165,8 +165,8 @@
 
                 //@TODO optimise
                 this.observeHandler = observeSize( this.$parent[ 0 ], function () {
-                    that.prepareCompute()
-                        .reCompute()
+                    //differ parentBox's height
+                    that.rect.offset.bottom += that.computeBoxModel( that.$parent ).height - that.pBox.height
                 } )
             } else {
                 var config             = this.config
@@ -262,52 +262,29 @@
 
         //TODO
         computePosition: function () {
-            var config = this.config,
-                rect   = this.rect,
-                elBox  = this.elBox,
-                pBox   = this.pBox
-
-            this.elBox = elBox
-            this.pBox  = pBox
-
-            //TODO
-            config.top  = config.top ? config.top : 0
-            config.left = config.left ? config.left : 0
-
-            rect.constraint = config
-            this.reCompute()
-
-            if ( config.bottom < 0 ) {
-                config.bottom = 0
-            }
-
-            if ( config.right < 0 ) {
-                config.right = 0
-            }
-
-            return this
-        },
-
-        //only care about $parent's height change
-        reCompute: function () {
             var config   = this.config,
                 $el      = this.$el,
-                rect     = this.$parent.offset(),
+                rect     = this.rect,
+                pOffset  = this.$parent.offset(),
                 elOffset = $el.offset(),
                 pBox     = this.pBox,
                 elBox    = this.elBox,
                 top      = elOffset.top,
                 left     = elOffset.left,
-                bottom   = parseCSSVal( $el.css( 'bottom' ) ),
-                right    = parseCSSVal( $el.css( 'right' ) ),
-                pTop     = rect.top - pBox.padding.top - pBox.margin.top,
-                pLeft    = rect.left - pBox.padding.left - pBox.margin.left,
-                top      = pTop > top ? pTop : top,
-                left     = pLeft > left ? pLeft : left
+                pTop     = pOffset.top - pBox.padding.top - pBox.margin.top,
+                pLeft    = pOffset.left - pBox.padding.left - pBox.margin.left,
+                bottom, right
 
-            bottom = top + pBox.height - bottom - pBox.padding.top - pBox.padding.bottom - elBox.margin.top - elBox.margin.bottom - elBox.height - config.top
-            right  = left + pBox.width - right - pBox.padding.left - pBox.padding.right - elBox.margin.left - elBox.margin.right - elBox.width - config.left
+            //TODO
+            top    = pTop > top ? pTop : top
+            left   = pLeft > left ? pLeft : left
+            bottom = top + pBox.height - pBox.padding.top - pBox.padding.bottom - elBox.margin.top - elBox.margin.bottom - elBox.height - config.top
+            right  = left + pBox.width - pBox.padding.left - pBox.padding.right - elBox.margin.left - elBox.margin.right - elBox.width - config.left
 
+            config.top  = config.top ? config.top : 0
+            config.left = config.left ? config.left : 0
+
+            rect.constraint = config
 
             if ( right < 0 ) {
                 left += right
@@ -331,6 +308,16 @@
             //TODO
             config.bottom = this.rect.offset.bottom - top
             config.right  = this.rect.offset.right - left
+
+            if ( config.bottom < 0 ) {
+                config.bottom = 0
+            }
+
+            if ( config.right < 0 ) {
+                config.right = 0
+            }
+
+            return this
         },
 
         check: function ( scrollTop, scrollLeft, isVertical ) {

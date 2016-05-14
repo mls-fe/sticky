@@ -24,6 +24,7 @@
         VERTICAL       = 'vertical',
         HORIZONTAL     = 'horizontal',
         SCROLL_EVENT   = 'scroll.sticky',
+        INTERVAL_VALUE = 2000,
         stickyStyleName
 
     /**
@@ -52,7 +53,7 @@
         var observer
 
         if ( typeof win.MutationObserver == 'undefined' ) {
-            var intervalId = setInterval( callback, 1000 )
+            var intervalId = setInterval( callback, INTERVAL_VALUE )
 
             observer = {
                 disconnect: function () {
@@ -153,6 +154,8 @@
         constructor: Sticky,
 
         init: function () {
+            var that = this
+
             if ( !isSupportSticky() ) {
                 this
                     .isQualified()
@@ -161,7 +164,10 @@
                     .computePosition()
 
                 //@TODO optimise
-                this.observeHandler = observeSize( this.$parent[ 0 ], this.reCompute.bind( this ) )
+                this.observeHandler = observeSize( this.$parent[ 0 ], function () {
+                    that.prepareCompute()
+                        .reCompute()
+                } )
             } else {
                 var config             = this.config
                 config.position        = stickyStyleName

@@ -16,7 +16,7 @@
             border        : 1px solid greenyellow;
         }
 
-        .title {
+        .global-title, .title {
             position         : relative;
             left             : 0;
             top              : 0;
@@ -28,6 +28,10 @@
             font-size        : 16px;
             color            : #fff;
             background-color : darkcyan;
+        }
+
+        ul .title {
+            visibility : hidden;
         }
 
         #container ul li {
@@ -48,20 +52,32 @@
 <script src="../index.js"></script>
 <script>
     (function () {
-        var tmpl = ''
+        var $el = $( '#container' )
 
-        for ( var i = 1; i <= 12; i++ ) {
-            tmpl += `<ul><h3 class="title">2015-${ i }-01</h3>`
-            for ( var j = 0; j < 1 + parseInt( Math.random() * 100 ); j++ ) {
-                tmpl += `<li>Test ${ i } - ${ j }</li>`
+        function generateHTML() {
+            var str = '<h3 class="global-title">Global Header</h3>'
+
+            for ( var i = 1; i <= 12; i++ ) {
+                str += `<ul><h3 class="title">2015-${ i }-01</h3>`
+                for ( var j = 0; j < 1 + parseInt( Math.random() * 100 ); j++ ) {
+                    str += `<li>Test ${ i } - ${ j }</li>`
+                }
+                str += '</ul>'
             }
-            tmpl += '</ul>'
+
+            return str
         }
 
-        $( '#container' ).html( tmpl )
+
+        $el.html( generateHTML() )
+
+        setTimeout( function () {
+            console.log( 'append!' )
+            $el.append( generateHTML() )
+        }, 5000 )
     })()
 
-    $( '.title' ).sticky()
+    $( '.global-title' ).sticky()
 </script>
 </body>
 </html>
